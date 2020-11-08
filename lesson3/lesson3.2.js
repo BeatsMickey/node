@@ -5,8 +5,6 @@ const FOLDER = 'b1gdqnr6coa2edd42jim'
 
 
 const app = express();
-app.use(express.static(__dirname));
-app.use(express.json());
 const translateRouter = express.Router();
 
 translateRouter.get('/:text', (req, res) => {
