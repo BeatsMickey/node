@@ -1,6 +1,6 @@
 const express = require('express');
-const request = require('request');
 const cheerio = require('cheerio');
+const axios = require('axios');
 const cookieSession = require('cookie-session')
 
 const bodyParser = require('body-parser');
@@ -48,29 +48,29 @@ app.get('/', (req, res, next) => {
 
 // Иначе выдается 403 ошибка на некоторых сайтах
 let options = {
-    headers: {'user-agent': 'node.js'}
+    headers: {'User-agent': 'node.js'}
 }
 
 app.post('/news',(req, res) => {
     const r = req.body;
     req.session.category = categoryPrev = r.category;
     req.session.site = sitePrev = r.site;
-    request(`https://${r.site}/`, options, function (error, response, html) {
-        if (!error && response.statusCode == 200) {
-            let $ = cheerio.load(html);
+    axios.get(`https://${r.site}/`, {}, options)
+        .then((response) => {
+            let $ = cheerio.load(response.data);
             let news = [];
 
             switch (r.site) {
                 case 'www.championat.com':
                     $('.article-preview').each(function (i, element) {
-                        if(($(element).find('.article-preview__tag').text()).trim() === getKeyByValue(categories, r.category)) {
+                        if (($(element).find('.article-preview__tag').text()).trim() === getKeyByValue(categories, r.category)) {
                             news.push($(element).find('.article-preview__title').text().replace(/[\s{2,}]+/g, ' ').trim());
                         }
                     });
                     break;
                 case 'news.sportbox.ru':
-                    $('.sport-block').each(function(i, element){
-                        if(($(element).find('.sport-block__title').children().first().text()).trim() === getKeyByValue(categories, r.category)) {
+                    $('.sport-block').each(function (i, element) {
+                        if (($(element).find('.sport-block__title').children().first().text()).trim() === getKeyByValue(categories, r.category)) {
                             let n = 0;
                             $(element).find('.sport-block__list').find('.title').each(function (i, el) {
                                 news.push($(el).text().replace(/[\s{2,}]+/g, ' ').trim());
@@ -79,12 +79,10 @@ app.post('/news',(req, res) => {
                     });
                     break;
             }
-
             res.render('main', { categories: categories, sites:  sites, news: news});
-        } else {
-            res.render('main', { categories: categories, sites:  sites, error: error});
-        }
-    });
+        }).catch((err) => {
+        res.render('main', { categories: categories, sites:  sites, error: err});
+        })
 })
 
 app.listen(3000, () => console.log('Listening on port 3000'));

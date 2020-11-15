@@ -11,6 +11,8 @@
     "express": "^4.17.1",
     "handlebars": "^4.7.6",
     "minimist": "^1.2.5",
-    "request": "^2.88.2"
+    "mysql2": "^2.2.5",
+    "request": "^2.88.2",
+    "sequelize": "^6.3.5"
   }
 }
