@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>News parser service</title>
+</head>
+<body>
+    {{#if error }}
+        <h1>Ошибка: {{ error }}</h1>
+    {{else}}
+        <h1>Результат:</h1>
+        {{#each news}}
+            <h3>{{ this }}</h3>
+        {{/each}}
+    {{/if}}
+
+    <form method="POST" action="/news">
+
+        <label>
+            Change site
+        <select name="site">
+            {{#each sites}}
+                <option value="{{ this }}"
+                    {{#if (equal this)}}
+                        selected
+                    {{/if}}
+                >{{ this }}</option>
+            {{/each}}
+        </select></label><br>
+
+        <label>
+            Change category
+        <select name="category">
+            {{#each categories}}
+                <option value="{{ this }}"
+                    {{#if (equal this)}}
+                        selected
+                    {{/if}}
+                >{{ this }}</option>
+            {{/each}}
+        </select></label><br>
+
+        <button type="submit">Get news</button>
+
+    </form>
+</body>
+</html>
