@@ -40,7 +40,7 @@ function getKeyByValue(object, value) {
 let sitePrev;
 let categoryPrev;
 
-app.get('/', (req, res, next) => {
+app.get('/', (req, res) => {
     sitePrev = req.session.site;
     categoryPrev = req.session.category;
     res.render('main', { categories: categories, sites: sites});
