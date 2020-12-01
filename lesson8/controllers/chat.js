@@ -2,6 +2,7 @@ exports.getChat = (req, res, next) => {
     if (!req.session.username) {
         res.redirect('/auth/login/')
     } else {
-        res.render('chat', {});
+        // req.session.chat = req.params.chat;
+        res.render('chat', {chat : req.params.chat});
     }
 }
