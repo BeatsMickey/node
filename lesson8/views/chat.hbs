@@ -16,24 +16,28 @@
   <body>
     <ul id="messages"></ul>
     <form action="">
+        <input id="chat" value="{{ chat }}" autocomplete="off" hidden="hidden">
       <input id="m" autocomplete="off" /><button onClick="submitMessage(event)">Send</button>
     </form>
     <script src="/socket.io/socket.io.js"></script>
     <script>
         var socket = io();
-
         function submitMessage(e) {
             const messageEl = document.getElementById('m');
+            const chat = document.getElementById('chat');
 
             e.preventDefault();
             console.log('chatMessage', messageEl.value);
-            socket.emit('chatMessage', { message: messageEl.value });
+            console.log('chat', chat.value);
+
+            socket.emit('chatMessage', { message: messageEl.value, chat: chat.value });
             messageEl.value='';
             messageEl.focus();
             return false;
         }
 
         socket.on('chatMessage', function (msg) {
+            console.log(msg);
             const messagesEl = document.getElementById('messages');
 
             const messageEl = document.createElement('li');
@@ -41,7 +45,6 @@
 
             messagesEl.appendChild(messageEl);
         });
-
     </script>
   </body>
 </html>

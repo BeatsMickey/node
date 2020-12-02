@@ -25,31 +25,6 @@ const sessionMiddleware = session({
 
 app.use(sessionMiddleware);
 
-io.use((socket, next) => {
-  sessionMiddleware(socket.request, {}, next);
-});
-
-io.on('connection', socket => {
-  if (!socket.request.session || !socket.request.session.username) {
-    console.log('Unauthorised user connected!');
-    socket.disconnect();
-    return;
-  }
-
-  console.log('Chat user connected:', socket.request.session.username);
-
-  socket.on('disconnect', () => {
-    console.log('Chat user disconnected:', socket.request.session.username);
-  })
-
-  socket.on('chatMessage', (data) => {
-    console.log('Chat message from', socket.request.session.username+':', data);
-    data.message = socket.request.session.username + ': ' + data.message;
-    io.emit('chatMessage', data);
-    // console.log(io.sockets.sockets);
-  })
-})
-
 const middlewares = require('./middlewares');
 app.use(middlewares.logSession);
 
@@ -70,6 +45,34 @@ app.set('views', __dirname + '/views');
 const router = require('./routers');
 
 app.use(router);
+
+io.use((socket, next) => {
+  sessionMiddleware(socket.request, {}, next);
+});
+
+io.on('connection', socket => {
+  if (!socket.request.session || !socket.request.session.username) {
+    console.log('Unauthorised user connected!');
+    socket.disconnect();
+    return;
+  }
+
+  console.log('Chat user connected:', socket.request.session.username);
+
+
+
+  socket.on('disconnect', () => {
+    console.log('Chat user disconnected:', socket.request.session.username);
+  })
+
+  socket.on('chatMessage', (data) => {
+    socket.join(data.chat);
+    console.log('Chat message from', socket.request.session.username + ':', data);
+    console.log('Socket id:', socket.id);
+    data.message = socket.request.session.username + ': ' + data.message;
+    io.to(data.chat).emit('chatMessage', data);
+  })
+})
 
 http.listen(3000, () => {
     console.log('Server listening on 3000 port.');
